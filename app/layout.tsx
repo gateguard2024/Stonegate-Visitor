@@ -1,23 +1,25 @@
-import './globals.css'
-import { SITE_CONFIG } from './config'
-import type { Metadata } from 'next'
+import { ThemeProvider } from 'next-themes';
+import './globals.css'; // Make sure this matches the path to your global CSS
 
-// This automatically sets the Browser Tab Title and Phone App Icon Name!
-export const metadata: Metadata = {
-  title: `${SITE_CONFIG.propertyName} | ${SITE_CONFIG.brandName}`,
-  description: SITE_CONFIG.footerText,
-}
+export const metadata = {
+  title: 'Gate Guard Access',
+  description: 'Secure Visitor Registration',
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-black text-white antialiased">
-        {children}
+    // suppressHydrationWarning is REQUIRED here so Next.js doesn't complain 
+    // when the theme switches between server-side and client-side rendering
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
