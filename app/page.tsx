@@ -149,7 +149,7 @@ export default function LandingPage() {
     setIsOfficeOpen(checkIsOpen());
   }, []);
 
-  const handleLeasingCall = async (visitorName: string, visitorPhone: string, email: string, reason: string) => {
+const handleLeasingCall = async (visitorName: string, visitorPhone: string, email: string, reason: string) => {
     setIsLeasingModalOpen(false);
     try {
       await fetch('/api/call', {
@@ -159,4 +159,13 @@ export default function LandingPage() {
           visitorName,
           visitorPhone: `+1${visitorPhone.replace(/\D/g, '')}`, 
           residentPhone: `+1${SITE_CONFIG.officePhone}`, 
-          residentName: "Leasing Office
+          residentName: "Leasing Office",
+          email,        
+          reason        
+        })
+      });
+      alert(lang === 'es' ? "¡Llamada iniciada!" : "Call initiated! Answer your phone.");
+    } catch (e) {
+      alert("Error. Please try again.");
+    }
+  };
