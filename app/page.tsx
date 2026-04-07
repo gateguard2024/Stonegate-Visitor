@@ -147,8 +147,12 @@ export default function LandingPage() {
       <LeasingPhoneModal isOpen={isLeasingModalOpen} onClose={() => setIsLeasingModalOpen(false)} onConfirm={handleLeasingCall} lang={lang} />
 
       <div className="w-full max-w-md p-6 flex flex-col items-center flex-grow pt-24">
-        <div className="text-center mb-8 flex flex-col items-center">
-          <img src="/Logo.jpg" alt="Property Logo" className="w-48 h-auto mb-6 rounded-2xl shadow-lg dark:shadow-[0_0_40px_rgba(255,255,255,0.1)]" />
+       <div className="text-center mb-8 flex flex-col items-center">
+          <img 
+            src="/Logo.jpg" 
+            alt="Property Logo" 
+            className="h-20 sm:h-24 w-auto max-w-[85%] object-contain mx-auto mb-8 drop-shadow-md rounded-xl" 
+          />
           <p className="text-xs font-black uppercase tracking-[0.3em] text-gray-500 dark:text-gray-400 mb-2">{text.welcome}</p>
           <h1 className="text-3xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none mb-2">{SITE_CONFIG.propertyName}</h1>
           <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">{SITE_CONFIG.propertyAddress}</p>
