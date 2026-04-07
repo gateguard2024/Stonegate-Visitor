@@ -132,7 +132,7 @@ export default function LandingPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white flex flex-col items-center font-sans overflow-hidden relative transition-colors duration-300">
+    <div className="min-h-screen bg-[#f0f4f8] dark:bg-[#0a0a0a] bg-[linear-gradient(to_right,#80808015_1px,transparent_1px),linear-gradient(to_bottom,#80808015_1px,transparent_1px)] bg-[size:24px_24px] text-gray-900 dark:text-white flex flex-col items-center font-sans overflow-hidden relative transition-colors duration-300">
       
       <div className="absolute top-6 right-6 flex items-center gap-3 z-10">
         <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 bg-white dark:bg-white/10 border-2 border-gray-200 dark:border-white/20 rounded-full hover:bg-gray-100 dark:hover:bg-white/20 transition-all shadow-sm">
