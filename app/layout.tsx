@@ -1,22 +1,21 @@
-import { ThemeProvider } from 'next-themes';
-import './globals.css'; // Make sure this matches the path to your global CSS
+import type { Metadata } from "next";
+import "./globals.css";
+import { ThemeProvider } from "next-themes";
 
-export const metadata = {
-  title: 'Gate Guard Access',
-  description: 'Secure Visitor Registration',
+export const metadata: Metadata = {
+  title: "Gate Guard System",
+  description: "Secure visitor management system",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    // suppressHydrationWarning is REQUIRED here so Next.js doesn't complain 
-    // when the theme switches between server-side and client-side rendering
     <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <body className="antialiased bg-gray-50 dark:bg-black">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>
       </body>
