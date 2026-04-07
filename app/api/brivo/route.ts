@@ -1,62 +1,64 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
+  // Pulling all highly sensitive Brivo credentials from Vercel!
+  const BRIVO_API_KEY = process.env.BRIVO_API_KEY || '';
+  const BRIVO_AUTH_BASIC = process.env.BRIVO_AUTH_BASIC || '';
+  const BRIVO_USERNAME = process.env.BRIVO_USERNAME || '';
+  const BRIVO_PASSWORD = process.env.BRIVO_PASSWORD || '';
+
   try {
-    const apiKey = process.env.BRIVO_API_KEY;
-    const username = process.env.BRIVO_USERNAME;
-    const password = process.env.BRIVO_PASSWORD;
-    const authBasic = process.env.BRIVO_AUTH_BASIC;
-
-    if (!apiKey || !username || !password || !authBasic) {
-      throw new Error("Missing Brivo credentials in Vercel.");
-    }
-
-    // 1. Get Temporary Access Token from Brivo using Password Grant
-    // (Checks if the word 'Basic ' is already in your variable, adds it if not)
-    const authHeader = authBasic.startsWith('Basic') ? authBasic : `Basic ${authBasic}`;
-
+    // STEP 1: LOGIN (Handshake)
     const tokenResponse = await fetch('https://auth.brivo.com/oauth/token', {
       method: 'POST',
-      headers: {
-        'Authorization': authHeader,
-        'api-key': apiKey,
-        'Content-Type': 'application/x-www-form-urlencoded'
+      cache: 'no-store', // Always get a fresh token to avoid 59-second expiration
+      headers: { 
+        'Authorization': `Basic ${BRIVO_AUTH_BASIC}`, 
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': '*/*'
       },
-      // We pass the username and password here instead of the client secret
-      body: `grant_type=password&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+      body: new URLSearchParams({ 
+        grant_type: 'password', 
+        username: BRIVO_USERNAME, 
+        password: BRIVO_PASSWORD 
+      }).toString()
     });
 
-    if (!tokenResponse.ok) throw new Error("Failed to authenticate with Brivo");
     const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
 
-    // 2. Fetch the User Directory
-    const usersResponse = await fetch('https://api.brivo.com/v1/users', {
+    if (!tokenResponse.ok) return NextResponse.json([{ id: "err", firstName: "Login", lastName: "Rejected" }]);
+
+    // STEP 2: FETCH USERS (The Daily Sync)
+    const residentsResponse = await fetch('https://api.brivo.com/v1/api/users?pageSize=100', {
+      // Tell Vercel to cache this list for 86,400 seconds (24 hours)
+      next: { revalidate: 86400 }, 
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'api-key': apiKey
+        'Authorization': `bearer ${tokenData.access_token}`,
+        'api-key': BRIVO_API_KEY.trim()
       }
     });
 
-    if (!usersResponse.ok) throw new Error("Failed to fetch residents from Brivo");
-    const usersData = await usersResponse.json();
+    if (!residentsResponse.ok) return NextResponse.json([{ id: "err", firstName: "Access", lastName: "Denied" }]);
 
-    // 3. Clean up the data to send to our frontend
-    const formattedUsers = (usersData.data || []).map((user: any) => {
-      // Find the phone number
-      const phoneNumber = user.phone ? user.phone : (user.customFields?.phone || "");
-      
-      return {
-        id: user.id,
-        name: `${user.firstName} ${user.lastName}`.trim(),
-        phone: phoneNumber
-      };
-    }).filter((user: any) => user.phone !== ""); // Filter out residents with no phone number
+    const data = await residentsResponse.json();
+    
+    const rawList = data.users || data.data || data.results || [];
+    
+    // 🛑 THE TWEAK: First Initial, Full Last Name
+    const residents = rawList.map((u: any) => ({
+      id: u.id || Math.random().toString(),
+      // Grabs the 1st character of the first name and adds a period (e.g., "J.")
+      firstName: u.firstName ? `${u.firstName.charAt(0)}.` : "",
+      // Keeps the full last name (e.g., "Smith")
+      lastName: u.lastName || "",
+      phoneNumber: u.phoneNumbers?.[0]?.number || "" 
+    }));
 
-    return NextResponse.json({ success: true, users: formattedUsers });
+    return NextResponse.json(residents);
 
   } catch (error: any) {
-    console.error("Brivo API Error:", error);
-    return NextResponse.json({ success: false, error: "Failed to load directory" }, { status: 500 });
+    return NextResponse.json([{ id: "err", firstName: "System", lastName: "Crash" }]);
   }
 }
