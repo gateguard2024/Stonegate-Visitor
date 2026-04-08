@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Package, Phone, ArrowLeft, X, ShieldCheck, ChevronRight } from 'lucide-react';
+import { Package, Phone, ArrowLeft, X, ShieldCheck, ChevronRight, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { SITE_CONFIG } from '../config';
 
 // --- TWILIO BRIDGE MODAL (For Delivery Drivers) ---
@@ -78,7 +79,7 @@ export default function PackagesPage() {
           visitorName: visitorName,
           visitorPhone: `+1${visitorPhone.replace(/\D/g, '')}`, 
           residentPhone: `+1${SITE_CONFIG.officePhone}`, 
-          residentName: "Leasing Office (Delivery)", // This exact phrase triggers the SMS Alert in our route.ts!
+          residentName: "Leasing Office (Delivery)", 
           reason: "Package / Delivery Courier"
         })
       });
@@ -107,32 +108,32 @@ export default function PackagesPage() {
           </button>
           <div className="text-right">
             <span className="text-xs font-black uppercase tracking-widest text-blue-400 italic">Packages</span>
-            {/* SaaS Variable showing the dynamic property name! */}
             <div className="text-[10px] font-bold text-gray-400 uppercase">{SITE_CONFIG.propertyName}</div>
           </div>
         </header>
 
-        {/* PACKAGE ICON BOX (The missing icon is back!) */}
+        {/* PACKAGE ICON BOX */}
         <div className="w-full bg-[#111] border-2 border-blue-500/30 p-8 rounded-[2.5rem] mb-8 relative overflow-hidden text-center">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl -mt-10"></div>
           
           <div className="flex justify-center mb-6 relative z-10">
             <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center animate-bounce shadow-[0_0_30px_rgba(59,130,246,0.3)]">
-              {/* Here is the box icon! */}
               <Package size={40} className="text-blue-400" />
             </div>
           </div>
           
           <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white mb-4 relative z-10">Deliveries</h2>
           
+          {/* SAAS DYNAMIC INSTRUCTIONS VARIABLE */}
           <p className="text-gray-300 text-sm leading-relaxed font-medium relative z-10">
-            All couriers must log their details to request gate access. Packages cannot be left at the gate.
+            {process.env.NEXT_PUBLIC_DELIVERY_INSTRUCTIONS || "All couriers must log their details to request gate access. Packages cannot be left at the gate."}
           </p>
         </div>
 
         {/* BUTTON LAYOUT */}
         <div className="w-full space-y-4">
           
+          {/* OPTION 1: Call Office */}
           <button 
             onClick={() => setIsModalOpen(true)}
             className={`w-full bg-[#111] border-2 p-6 rounded-[2.5rem] flex items-center justify-between group transition-all ${!isOfficeOpen ? 'border-red-900/50 opacity-60' : 'border-blue-500/60 hover:bg-blue-900/30'}`}
@@ -150,6 +151,31 @@ export default function PackagesPage() {
             </div>
             {isOfficeOpen && <ChevronRight size={28} className="text-blue-400 group-hover:translate-x-2 transition-transform" />}
           </button>
+
+          {/* VISUAL DIVIDER */}
+          <div className="w-full flex items-center justify-center space-x-3 my-2 opacity-50">
+            <div className="h-px bg-white/20 flex-1"></div>
+            <span className="text-white text-[10px] font-black uppercase tracking-[0.3em]">Or</span>
+            <div className="h-px bg-white/20 flex-1"></div>
+          </div>
+
+          {/* OPTION 2: Directory Lookup */}
+          <Link href="/directory" className="w-full block">
+            <button className="w-full bg-[#111] border-2 border-slate-700/60 hover:bg-slate-800/50 p-6 rounded-[2.5rem] flex items-center justify-between group transition-all">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center shadow-lg">
+                  <Users size={28} className="text-slate-300" />
+                </div>
+                <div className="text-left">
+                  <span className="text-2xl font-black uppercase italic tracking-tighter text-white block leading-none">Directory</span>
+                  <span className="text-xs font-bold uppercase tracking-widest mt-2 block text-slate-400">
+                    Look Up Resident
+                  </span>
+                </div>
+              </div>
+              <ChevronRight size={28} className="text-slate-500 group-hover:translate-x-2 transition-transform" />
+            </button>
+          </Link>
 
         </div>
 
