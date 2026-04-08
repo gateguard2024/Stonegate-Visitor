@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const authData = await authResponse.json();
     const doorId = process.env.BRIVO_DOOR_ID;
     
-    const unlockResponse = await fetch(`https://api.brivo.com/v1/api/access-points/${doorId}/unlock`, {
+    const unlockResponse = await fetch(`https://api.brivo.com/v1/api/access-points/${doorId}/activate`, {
       method: 'POST',
       headers: {
         'api-key': process.env.BRIVO_API_KEY || '',
