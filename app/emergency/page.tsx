@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { AlertTriangle, Phone, ArrowLeft, ShieldAlert, X, Activity, Keypad, Delete, Unlock } from 'lucide-react';
+import { AlertTriangle, Phone, ArrowLeft, ShieldAlert, X, Activity, Grid3X3, Delete, Unlock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SITE_CONFIG } from '../config';
 
@@ -13,7 +13,7 @@ const KeypadModal = ({ isOpen, onClose }: any) => {
 
   const handleKeyPress = (num: string) => {
     if (pin.length < 8) setPin(prev => prev + num);
-    setStatus('idle'); // clear error state on new input
+    setStatus('idle');
   };
 
   const handleDelete = () => {
@@ -26,7 +26,6 @@ const KeypadModal = ({ isOpen, onClose }: any) => {
     setStatus('loading');
     
     try {
-      // This will hit our upcoming Next.js backend route
       const response = await fetch('/api/brivo/unlock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -63,7 +62,6 @@ const KeypadModal = ({ isOpen, onClose }: any) => {
           <button onClick={onClose} className="p-2 bg-white/10 rounded-full text-white hover:bg-white/20 transition"><X size={20}/></button>
         </div>
 
-        {/* PIN DISPLAY SCREEN */}
         <div className={`w-full h-16 bg-black border-2 rounded-2xl flex items-center justify-center mb-6 transition-colors ${
           status === 'error' ? 'border-red-500' : status === 'success' ? 'border-green-500' : 'border-white/20'
         }`}>
@@ -77,7 +75,6 @@ const KeypadModal = ({ isOpen, onClose }: any) => {
           )}
         </div>
 
-        {/* NUMBER PAD */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <button 
@@ -113,7 +110,7 @@ const KeypadModal = ({ isOpen, onClose }: any) => {
   );
 };
 
-// --- AFTER HOURS MODAL ---
+// --- AFTER HOURS CALL MODAL ---
 const EmergencyModal = ({ isOpen, onClose, onConfirm }: any) => {
   const [number, setNumber] = useState('');
   if (!isOpen) return null;
@@ -185,7 +182,6 @@ export default function EmergencyPage() {
 
       <div className="w-full max-w-md p-6 flex flex-col flex-grow">
         
-        {/* HEADER SECTION */}
         <header className="w-full flex items-center justify-between mb-6 pt-4">
           <button onClick={() => router.push('/')} className="p-3 bg-white/10 rounded-2xl text-white hover:bg-white/20 transition">
             <ArrowLeft size={24} />
@@ -196,7 +192,6 @@ export default function EmergencyPage() {
           </div>
         </header>
 
-        {/* 911 WARNING BOX */}
         <div className="w-full bg-red-950/40 border-2 border-red-600/50 p-6 rounded-[2rem] mb-6 relative overflow-hidden text-center">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-red-600/20 rounded-full blur-3xl -mt-10"></div>
           <div className="flex justify-center mb-4 relative z-10">
@@ -208,7 +203,6 @@ export default function EmergencyPage() {
           <p className="text-red-200 text-sm leading-relaxed font-bold relative z-10">{text911}</p>
         </div>
 
-        {/* FIRST RESPONDER INSTRUCTIONS & KEYPAD BUTTON */}
         <div className="w-full bg-[#111] border-2 border-blue-500/30 p-6 rounded-[2rem] mb-6 text-center">
           <div className="flex justify-center mb-3">
             <ShieldAlert size={28} className="text-blue-400" />
@@ -220,12 +214,11 @@ export default function EmergencyPage() {
             onClick={() => setIsKeypadModalOpen(true)}
             className="w-full bg-blue-900/30 border border-blue-500/50 hover:bg-blue-800/40 py-4 rounded-xl flex items-center justify-center gap-3 transition-all"
           >
-            <Keypad size={20} className="text-blue-400" />
+            <Grid3X3 size={20} className="text-blue-400" />
             <span className="font-black uppercase tracking-widest text-sm text-blue-100">Backup Entry Keypad</span>
           </button>
         </div>
 
-        {/* AFTER HOURS BUTTON */}
         <div className="w-full mt-auto">
           <button 
             onClick={() => setIsPhoneModalOpen(true)}
@@ -242,6 +235,11 @@ export default function EmergencyPage() {
             </div>
           </button>
         </div>
+
+        <footer className="mt-auto py-10 opacity-40 flex items-center justify-center gap-2">
+          <ShieldAlert size={16} className="text-white" />
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white">{SITE_CONFIG.footerText}</span>
+        </footer>
 
       </div>
     </div>
